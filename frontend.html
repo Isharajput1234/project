@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GEU - Smart Classroom & Lab Booking System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary: #5d4037;
+      --primary-dark: #3e2723;
+      --primary-light: #8d6e63;
+      --secondary: #6d4c41;
+      --accent: #d4a574;
+      --beige: #f5f5dc;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --warning: #f57c00;
+      --glass-bg: rgba(245, 245, 220, 0.15);
+      --glass-border: rgba(245, 245, 220, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, rgba(93, 64, 55, 0.92) 0%, rgba(109, 76, 65, 0.88) 100%),
+                  url('https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2000') center/cover fixed;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 30% 50%, rgba(212, 165, 116, 0.15), transparent 60%),
+                  radial-gradient(circle at 70% 50%, rgba(141, 110, 99, 0.12), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .active-page {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .top-header {
+      background: linear-gradient(135deg, rgba(62, 39, 35, 0.98), rgba(93, 64, 55, 0.98));
+      border-bottom: 3px solid var(--accent);
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .university-info h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--beige);
+      margin: 0;
+      letter-spacing: 1px;
+    }
+
+    .university-info p {
+      color: rgba(245, 245, 220, 0.8);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .navbar {
+      background: var(--glass-bg) !important;
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--beige) !important;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .navbar .user-info {
+      color: var(--beige);
+      font-weight: 500;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(93, 64, 55, 0.2);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-label {
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+      background: rgba(245, 245, 220, 0.3);
+      border: 1.5px solid rgba(93, 64, 55, 0.3);
+      border-radius: 8px;
+      padding: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background: rgba(245, 245, 220, 0.5);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.2rem rgba(93, 64, 55, 0.25);
+    }
+
+    .btn {
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border: none;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(93, 64, 55, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #2e7d32, #43a047);
+      border: none;
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, #1b5e20, #2e7d32);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #c62828, #e53935);
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #b71c1c, #c62828);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-light {
+      border: 2px solid var(--beige);
+      color: var(--beige);
+      background: transparent;
+    }
+
+    .btn-outline-light:hover {
+      background: rgba(245, 245, 220, 0.2);
+      border-color: var(--beige);
+      color: var(--beige);
+    }
+
+    .nav-tabs {
+      border-bottom: 2px solid rgba(93, 64, 55, 0.2);
+      margin-bottom: 2rem;
+    }
+
+    .nav-tabs .nav-link {
+      background: transparent;
+      border: none;
+      color: rgba(245, 245, 220, 0.7);
+      font-weight: 600;
+      padding: 1rem 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link.active {
+      background: rgba(245, 245, 220, 0.2);
+      color: var(--beige);
+      border-bottom: 3px solid var(--accent);
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: var(--beige);
+      background: rgba(245, 245, 220, 0.1);
+    }
+
+    .table {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .table th {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      font-weight: 600;
+      padding: 1rem;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    .table td {
+      padding: 1rem;
+      vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+      background: rgba(93, 64, 55, 0.05);
+    }
+
+    .table-warning {
+      background-color: rgba(255, 193, 7, 0.15) !important;
+    }
+
+    .badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .page-title {
+      color: var(--beige);
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .page-subtitle {
+      color: rgba(245, 245, 220, 0.8);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .login-card {
+      max-width: 450px;
+      margin: 5rem auto;
+    }
+
+    .login-card .card {
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header i {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .login-header h2 {
+      color: var(--primary);
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      color: #666;
+      margin: 0;
+    }
+
+    .alert {
+      border-radius: 12px;
+      border: none;
+      padding: 1rem 1.5rem;
+      animation: slideInRight 0.5s ease-out;
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .page-title { font-size: 1.5rem; }
+      .table { font-size: 0.85rem; }
+      .btn { padding: 0.6rem 1rem; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-9">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-university fs-1 text-warning me-3"></i>
+            <div class="university-info">
+              <h1>GRAPHIC ERA UNIVERSITY</h1>
+              <p>Smart Classroom & Lab Management System</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 text-end text-white-50">
+          <small><i class="fas fa-map-marker-alt me-1"></i>Dehradun, Uttarakhand</small>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-door-open me-2"></i>SmartRooms
+      </a>
+      <div class="ms-auto d-flex align-items-center">
+        <span id="navUser" class="user-info me-3"></span>
+        <button id="logoutBtn" class="btn btn-outline-light btn-sm d-none">
+          <i class="fas fa-sign-out-alt me-1"></i>Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="page active-page">
+      <div class="login-card">
+        <div class="card p-5">
+          <div class="login-header">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>Welcome Back</h2>
+            <p>Sign in to access the booking system</p>
+          </div>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label class="form-label">
+                <i class="fas fa-envelope me-2"></i>Email Address
+              </label>
+              <input type="email" class="form-control" id="loginEmail" placeholder="your.email@geu.ac.in" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">
+                <i class="fas fa-lock me-2"></i>Password
+              </label>
+              <input type="password" class="form-control" id="loginPassword" placeholder="Enter password" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">
+                <i class="fas fa-user-tag me-2"></i>Login As
+              </label>
+              <select id="loginRole" class="form-select">
+                <option value="student">Student</option>
+                <option value="faculty">Faculty/HOD</option>
+                <option value="hod">HOD (Approval Only)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </button>
+          </form>
+          <div class="mt-3 text-center text-muted small">
+            <p>Demo Credentials: Any email/password works for testing</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENT DASHBOARD -->
+    <div id="studentPage" class="page">
+      <div class="mb-4">
+        <h1 class="page-title">
+          <i class="fas fa-user-graduate me-2"></i>Student Dashboard
+        </h1>
+        <p class="page-subtitle">Book classrooms and labs for your academic activities</p>
+      </div>
+
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#studentAvailability">
+            <i class="fas fa-search me-2"></i>Check Availability
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#studentBook">
+            <i class="fas fa-calendar-plus me-2"></i>Book Room
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#studentBookings">
+            <i class="fas fa-list me-2"></i>My Bookings
+          </a>
+        </li>
+      </ul>
+
+      <div class="tab-content mt-4">
+        <div class="tab-pane fade show active" id="studentAvailability">
+          <div class="card p-4">
+            <h5 class="mb-4">Available Rooms</h5>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Room ID</th>
+                    <th>Type</th>
+                    <th>Capacity</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>C-101</strong></td>
+                    <td><span class="badge bg-primary">Classroom</span></td>
+                    <td>60 Students</td>
+                    <td>Main Block, Floor 1</td>
+                    <td><span class="badge bg-success">Available</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>L-201</strong></td>
+                    <td><span class="badge bg-info">Computer Lab</span></td>
+                    <td>30 Systems</td>
+                    <td>Tech Block, Floor 2</td>
+                    <td><span class="badge bg-success">Available</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>SH-301</strong></td>
+                    <td><span class="badge bg-warning text-dark">Seminar Hall</span></td>
+                    <td>100 People</td>
+                    <td>Admin Block, Floor 3</td>
+                    <td><span class="badge bg-success">Available</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="studentBook">
+          <div class="card p-4">
+            <h5 class="mb-4">Create New Booking</h5>
+            <form id="bookingForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Select Room</label>
+                  <select class="form-select" id="bookRoom" required></select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Purpose</label>
+                  <select class="form-select" id="bookPurpose" required>
+                    <option value="">Select purpose...</option>
+                    <option value="Lecture">Lecture</option>
+                    <option value="Practical">Practical Session</option>
+                    <option value="Seminar">Seminar/Workshop</option>
+                    <option value="Meeting">Meeting</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Start Time</label>
+                  <input type="datetime-local" class="form-control" id="bookStart" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">End Time</label>
+                  <input type="datetime-local" class="form-control" id="bookEnd" required>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Additional Notes (Optional)</label>
+                <textarea class="form-control" id="bookNotes" rows="3" placeholder="Any special requirements..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-check me-2"></i>Submit Booking Request
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="studentBookings">
+          <div class="card p-4">
+            <h5 class="mb-4">My Booking Requests</h5>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Room</th>
+                    <th>Purpose</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="myBookingsTable">
+                  <tr>
+                    <td colspan="5" class="text-center text-muted">No bookings yet</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FACULTY DASHBOARD -->
+    <div id="facultyPage" class="page">
+      <div class="mb-4">
+        <h1 class="page-title">
+          <i class="fas fa-chalkboard-teacher me-2"></i>Faculty/HOD Dashboard
+        </h1>
+        <p class="page-subtitle">Book classrooms and labs for your academic activities <span class="badge bg-warning text-dark ms-2"><i class="fas fa-star me-1"></i>High Priority</span></p>
+      </div>
+
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#facultyAvailability">
+            <i class="fas fa-search me-2"></i>Check Availability
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#facultyBook">
+            <i class="fas fa-calendar-plus me-2"></i>Book Room
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#facultyBookings">
+            <i class="fas fa-list me-2"></i>My Bookings
+          </a>
+        </li>
+      </ul>
+
+      <div class="tab-content mt-4">
+        <div class="tab-pane fade show active" id="facultyAvailability">
+          <div class="card p-4">
+            <h5 class="mb-4">Available Rooms</h5>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Room ID</th>
+                    <th>Type</th>
+                    <th>Capacity</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>C-101</strong></td>
+                    <td><span class="badge bg-primary">Classroom</span></td>
+                    <td>60 Students</td>
+                    <td>Main Block, Floor 1</td>
+                    <td><span class="badge bg-success">Available</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>L-201</strong></td>
+                    <td><span class="badge bg-info">Computer Lab</span></td>
+                    <td>30 Systems</td>
+                    <td>Tech Block, Floor 2</td>
+                    <td><span class="badge bg-success">Available</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>SH-301</strong></td>
+                    <td><span class="badge bg-warning text-dark">Seminar Hall</span></td>
+                    <td>100 People</td>
+                    <td>Admin Block, Floor 3</td>
+                    <td><span class="badge bg-success">Available</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="facultyBook">
+          <div class="card p-4">
+            <h5 class="mb-4">Create New Booking <span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>High Priority</span></h5>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i>Faculty/HOD bookings are marked as high priority and will be reviewed first.
+            </div>
+            <form id="facultyBookingForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                 <label class="form-label">Select Room</label>
+                <select class="form-select" id="facultyBookRoom" required>
+            <option value="">Choose a room...</option>
+               </select>
+               </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Purpose</label>
+                  <select class="form-select" id="facultyBookPurpose" required>
+                    <option value="">Select purpose...</option>
+                    <option value="Lecture">Lecture</option>
+                    <option value="Practical">Practical Session</option>
+                    <option value="Seminar">Seminar/Workshop</option>
+                    <option value="Meeting">Meeting</option>
+                    <option value="Exam">Examination</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Start Time</label>
+                  <input type="datetime-local" class="form-control" id="facultyBookStart" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">End Time</label>
+                  <input type="datetime-local" class="form-control" id="facultyBookEnd" required>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Additional Notes (Optional)</label>
+                <textarea class="form-control" id="facultyBookNotes" rows="3" placeholder="Any special requirements..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-check me-2"></i>Submit Booking Request
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="facultyBookings">
+          <div class="card p-4">
+            <h5 class="mb-4">My Booking Requests</h5>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Room</th>
+                    <th>Purpose</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="facultyBookingsTable">
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">No bookings yet</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOD DASHBOARD -->
+    <div id="hodPage" class="page">
+      <div class="mb-4">
+        <h1 class="page-title">
+          <i class="fas fa-user-tie me-2"></i>HOD Dashboard
+        </h1>
+        <p class="page-subtitle">Review and manage booking requests</p>
+      </div>
+
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#hodPending">
+            <i class="fas fa-clock me-2"></i>Pending Requests
+            <span class="badge bg-danger ms-2" id="pendingCount">0</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#hodHistory">
+            <i class="fas fa-history me-2"></i>History
+          </a>
+        </li>
+      </ul>
+
+      <div class="tab-content mt-4">
+        <div class="tab-pane fade show active" id="hodPending">
+          <div class="card p-4">
+            <h5 class="mb-4">Pending Approval</h5>
+            <div class="alert alert-warning">
+              <i class="fas fa-info-circle me-2"></i>Faculty/HOD requests are highlighted and appear first with high priority.
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Room</th>
+                    <th>Purpose</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingTable">
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">No pending requests</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="hodHistory">
+          <div class="card p-4">
+            <h5 class="mb-4">Approval History</h5>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Room</th>
+                    <th>Purpose</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTable">
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">No history available</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="alertContainer" class="mt-3"></div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ===== GLOBAL STATE =====
+    let currentUser = null;
+
+    // ===== Page navigation =====
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active-page'));
+      document.getElementById(pageId).classList.add('active-page');
+    }
+
+    function showAlert(message, type = 'success') {
+      const alertContainer = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} alert-dismissible fade show`;
+      alert.innerHTML = `${message} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+      alertContainer.appendChild(alert);
+      setTimeout(() => alert.remove(), 5000);
+    }
+
+    // ===== LOGIN (calls login.php) =====
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const role = document.getElementById('loginRole').value;
+
+      fetch('login.php', {
+    method: 'POST',
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&role=${encodeURIComponent(role)}`
+})
+.then(r => r.text())
+.then(txt => {
+    console.log("Login response:", txt);
+
+    try {
+        const data = JSON.parse(txt);
+
+        if (data.success) {
+            showAlert("Login successful", "success");
+
+            currentUser = {
+                email: data.user.email,
+                role: data.user.role,
+                name: data.user.name
+            };
+
+            document.getElementById("navUser").textContent =
+                `${currentUser.name} (${currentUser.role})`;
+
+            document.getElementById("logoutBtn").classList.remove("d-none");
+
+           // ===== After Login: Load Correct Dashboard + Rooms =====
+if (currentUser.role === "student") {
+    showPage("studentPage");
+    loadRooms();   // Load room list for student
+}
+
+if (currentUser.role === "faculty") {
+    showPage("facultyPage");
+    loadRooms();   // Load room list for faculty
+}
+
+if (currentUser.role === "hod") {
+    showPage("hodPage");
+    loadHODRequests();   // ✅ FIXED //change to loadHODRequests(); from loadRooms();
+}
+
+        } else {
+            showAlert("Invalid credentials", "danger");
+        }
+
+    } catch (e) {
+        console.error("JSON Parse Error:", txt);
+        showAlert("Server returned invalid response", "danger");
+    }
+})
+.catch(err => {
+    console.error(err);
+    showAlert("Login request failed (PHP/Apache issue)", "danger");
+});
+    });
+
+    // ===== Logout =====
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      currentUser = null;
+      document.getElementById('navUser').textContent = '';
+      document.getElementById('logoutBtn').classList.add('d-none');
+      document.getElementById('loginForm').reset();
+      showPage('loginPage');
+      showAlert('You have been logged out successfully.', 'info');
+    });
+
+   // ===== Student booking (sends JSON to book_room.php) =====
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (!currentUser) { 
+        showAlert('Please login first', 'warning'); 
+        return; 
+    }
+
+const start = document.getElementById('bookStart').value;
+const end = document.getElementById('bookEnd').value;
+
+// === FIX DATE + TIME FORMAT ===
+function convertToDateOnly(dt) {
+    const parts = dt.split(" ");
+    const d = parts[0].split("-");
+    return `${d[2]}-${d[1]}-${d[0]}`;  // YYYY-MM-DD
+}
+
+const formattedDate = convertToDateOnly(start);
+const formattedSlot = `${start} - ${end}`;
+
+const payload = {
+    user_id: currentUser.email,
+    user_role: 'student',
+    room: document.getElementById('bookRoom').value,
+    date: formattedDate,
+    time_slot: formattedSlot,
+    purpose: document.getElementById('bookPurpose').value
+};
+
+    fetch('book_room.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(obj => {
+        if (obj.status === 'success') {
+            showAlert('Booking request submitted — awaiting approval', 'success');
+            document.getElementById('bookingForm').reset();
+            loadStudentBookings();
+        } else {
+            showAlert('Booking failed: ' + (obj.message || 'server error'), 'danger');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showAlert('Booking request failed. Check backend.', 'danger');
+    });
+});
+
+
+// ===== Faculty booking (sends JSON to book_room.php) =====
+document.getElementById('facultyBookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (!currentUser) { 
+        showAlert('Please login first', 'warning'); 
+        return; 
+    }
+
+    const start = document.getElementById('facultyBookStart').value;
+    const end   = document.getElementById('facultyBookEnd').value;
+
+    const payload = {
+        user_id: currentUser.email,
+        user_role: 'faculty',
+        room: document.getElementById('facultyBookRoom').value,
+        date: start.split("T")[0],
+        time_slot: start.replace("T"," ") + " - " + end.replace("T"," "),
+        purpose: document.getElementById('facultyBookPurpose').value
+    };
+
+    fetch('book_room.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(obj => {
+        if (obj.status === 'success') {
+            showAlert('High priority booking submitted', 'success');
+            document.getElementById('facultyBookingForm').reset();
+            loadFacultyBookings();
+        } else {
+            showAlert('Booking failed: ' + (obj.message || 'server error'), 'danger');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showAlert('Booking request failed. Check backend.', 'danger');
+    });
+});
+    // ===== Load student bookings from backend =====
+    function loadStudentBookings() {
+      const tbody = document.getElementById('myBookingsTable');
+      if (!currentUser) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Please login</td></tr>'; return; }
+
+      fetch(`get_my_bookings.php?user_id=${encodeURIComponent(currentUser.email)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!Array.isArray(data) || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No bookings yet</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(booking => `
+            <tr>
+              <td><strong>${booking.room}</strong></td>
+              <td>${booking.purpose}</td>
+              <td>${formatDateTime(booking.date + ' ' + (booking.time_slot || ''))}</td>
+              <td></td>
+              <td>${getStatusBadge(booking.status)}</td>
+            </tr>
+          `).join('');
+        }).catch(err=>{
+          console.error(err);
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Error loading bookings</td></tr>';
+        });
+    }
+
+    // ===== Load faculty bookings from backend =====
+    function loadFacultyBookings() {
+      const tbody = document.getElementById('facultyBookingsTable');
+      if (!currentUser) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Please login</td></tr>'; return; }
+
+      fetch(`get_my_bookings.php?user_id=${encodeURIComponent(currentUser.email)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!Array.isArray(data) || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No bookings yet</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(booking => `
+            <tr>
+              <td><strong>${booking.room}</strong></td>
+              <td>${booking.purpose}</td>
+              <td>${formatDateTime(booking.date + ' ' + (booking.time_slot || ''))}</td>
+              <td></td>
+              <td><span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>High</span></td>
+              <td>${getStatusBadge(booking.status)}</td>
+            </tr>
+          `).join('');
+        }).catch(err=>{
+          console.error(err);
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Error loading bookings</td></tr>';
+        });
+    }
+
+    // ===== Load HOD requests (all bookings) =====
+  function loadHODRequests() {
+  const pendingTable = document.getElementById('pendingTable');
+  const historyTable = document.getElementById('historyTable');
+
+  fetch('get_all_requests.php')
+    .then(r => r.json())
+    .then(data => {
+
+      const pending = data.filter(b => b.status === 'pending');
+      const history = data.filter(b => b.status !== 'pending');
+
+      document.getElementById('pendingCount').textContent = pending.length;
+
+      if (pending.length === 0) {
+        pendingTable.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No pending requests</td></tr>';
+      } else {
+        pendingTable.innerHTML = pending.map(booking => `
+          <tr>
+            <td><strong>${booking.user}</strong></td>
+            <td><span class="badge ${booking.user_role === 'faculty' ? 'bg-warning text-dark' : 'bg-primary'}">${booking.user_role}</span></td>
+            <td><strong>${booking.room}</strong></td>
+            <td>${booking.purpose}</td>
+            <td>${booking.date} <br><small class="text-muted">${booking.time_slot}</small></td>
+            <td>
+              <button class="btn btn-success btn-sm me-1" onclick="approveRequest(${booking.id})"><i class="fas fa-check"></i> Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="rejectRequest(${booking.id})"><i class="fas fa-times"></i> Reject</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      if (history.length === 0) {
+        historyTable.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No history available</td></tr>';
+      } else {
+        historyTable.innerHTML = history.map(booking => `
+          <tr>
+            <td><strong>${booking.user}</strong></td>
+            <td><span class="badge ${booking.user_role === 'faculty' ? 'bg-warning text-dark' : 'bg-primary'}">${booking.user_role}</span></td>
+            <td><strong>${booking.room}</strong></td>
+            <td>${booking.purpose}</td>
+            <td>${booking.date} <br><small class="text-muted">${booking.time_slot}</small></td>
+            <td>${getStatusBadge(booking.status)}</td>
+          </tr>
+        `).join('');
+      }
+    })
+}
+window.loadHODRequests = loadHODRequests;
+    // ===== Approve request (POST form urlencoded) =====
+   function approveRequest(id) {
+  fetch('approve_request.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `id=${encodeURIComponent(id)}&status=approved`
+  })
+  .then(r => r.json())
+  .then(res => {
+    showAlert('Request approved', 'success');
+    loadHODRequests();
+  });
+}
+
+
+    // ===== Reject request =====
+  function rejectRequest(id) {
+  fetch('approve_request.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `id=${encodeURIComponent(id)}&status=rejected`
+  })
+  .then(r => r.json())
+  .then(res => {
+    showAlert('Request rejected', 'warning');
+    loadHODRequests();
+  });
+}
+
+    // ===== Utility functions =====
+    function formatDateTime(datetime) {
+      if (!datetime) return '';
+      // try if it's already a date like "2025-11-20T10:00"
+      try {
+        const d = new Date(datetime);
+        if (isNaN(d)) return datetime;
+        return d.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch(e) {
+        return datetime;
+      }
+    }
+
+    function getStatusBadge(status) {
+      const badges = {
+        pending: '<span class="badge bg-warning text-dark">Pending</span>',
+        approved: '<span class="badge bg-success">Approved</span>',
+        rejected: '<span class="badge bg-danger">Rejected</span>'
+      };
+      return badges[status] || badges.pending;
+    }
+
+    // ===== Initialize small behaviors: make approve/reject global (they are functions above) =====
+    window.approveRequest = approveRequest;
+    window.rejectRequest = rejectRequest;
+    // ===== Load rooms into dropdowns =====
+   function loadRooms() {
+    fetch('get_rooms.php')
+        .then(r => r.json())
+        .then(data => {
+            const studentSelect = document.getElementById("bookRoom");
+            const facultySelect = document.getElementById("facultyBookRoom");
+
+            if (studentSelect)
+                studentSelect.innerHTML = `<option value="">Choose a room...</option>`;
+            if (facultySelect)
+                facultySelect.innerHTML = `<option value="">Choose a room...</option>`;
+
+            data.forEach(r => {
+                const option = `<option value="${r.room_id}">
+                        ${r.room_id} (${r.room_type} - ${r.capacity})
+                    </option>`;
+
+                if (studentSelect) studentSelect.innerHTML += option;
+                if (facultySelect) facultySelect.innerHTML += option;
+            });
+        })
+        .catch(err => console.error("Room load error:", err));
+}
+loadRooms();
+
+  </script>
+</body>
+</html>
